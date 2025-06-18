@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "507573897639",
+    "project_id": "notifactiontest-ea12b",
+    "storage_bucket": "notifactiontest-ea12b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507573897639:android:9a5886b643274772054e82",
+        "android_client_info": {
+          "package_name": "com.example.notifactiontest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzBEYIuSWhnC9yRWobBemzs2w8DaNOEz0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507573897639:android:969c922bcfa47921054e82",
+        "android_client_info": {
+          "package_name": "com.example.tathkara_dashboard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzBEYIuSWhnC9yRWobBemzs2w8DaNOEz0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
