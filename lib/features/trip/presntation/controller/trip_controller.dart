@@ -95,8 +95,8 @@ class TripController extends GetxController {
       });
 
       Get.snackbar(
-        '✅ Success',
-        'Trip added successfully!',
+        'تمت العملية بنجاح',
+        'تمت إضافة الرحلة بنجاح!',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
@@ -104,11 +104,71 @@ class TripController extends GetxController {
       formKey.currentState!.reset();
       seatCount.value = 0;
       update();
+      await Future.delayed(const Duration(milliseconds: 800));
       Get.back();
     } catch (e) {
       Get.snackbar(
-        '❌ Error',
-        'Failed to add trip: $e',
+        'حدث خطأ',
+        'فشل في إضافة الرحلة: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> updateTrip(Trip trip) async {
+    isLoading.value = true;
+    try {
+      await _firestore.collection('trips').doc(trip.id).update({
+        'from': trip.from,
+        'to': trip.to,
+        'date': trip.date,
+        'timeLeave': trip.timeLeave,
+        'timeArrive': trip.timeArrive,
+        'seats': trip.seats,
+        'price': trip.price,
+        'notes': trip.notes ?? '',
+      });
+      Get.snackbar(
+        'تمت العملية بنجاح',
+        'تم تعديل الرحلة بنجاح!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+      update();
+      await Future.delayed(const Duration(milliseconds: 800));
+      Get.back();
+    } catch (e) {
+      Get.snackbar(
+        'حدث خطأ',
+        'فشل في تعديل الرحلة: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteTrip(String tripId) async {
+    isLoading.value = true;
+    try {
+      await _firestore.collection('trips').doc(tripId).delete();
+      Get.snackbar(
+        'تم الحذف',
+        'تم حذف الرحلة بنجاح!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+      update();
+      await Future.delayed(const Duration(milliseconds: 800));
+      Get.back(result: true);
+    } catch (e) {
+      Get.snackbar(
+        'حدث خطأ',
+        'فشل في حذف الرحلة: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

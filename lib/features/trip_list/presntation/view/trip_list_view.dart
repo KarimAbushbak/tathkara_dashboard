@@ -11,6 +11,8 @@ import '../../../../core/resources/manager_height.dart';
 import '../../../../core/resources/manager_strings.dart';
 import '../../../../core/resources/manager_width.dart';
 import '../../../company_login/presntation/controller/company_login_controller.dart';
+import '../../../trip/presntation/view/add_trip_page.dart';
+import '../../../trip/presntation/view/edit_trip.dart';
 
 class TripListView extends StatelessWidget {
   const TripListView({super.key});
@@ -258,7 +260,9 @@ class TripListView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.to(() => EditTripPage(trip: controller.tripList[index]));
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: ManagerColors.red,
                               shape: RoundedRectangleBorder(

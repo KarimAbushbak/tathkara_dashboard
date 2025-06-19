@@ -7,6 +7,7 @@ import '../../../../core/resources/manager_font_weight.dart';
 import '../../../../core/resources/manager_height.dart';
 import '../../../../core/resources/manager_strings.dart';
 import '../controller/trip_controller.dart';
+import '../model/trip_model.dart';
 
 class AddTripPage extends StatelessWidget {
   final String companyId;
@@ -70,8 +71,41 @@ class AddTripPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                onPressed: () => controller.addTrip(companyId),
-                icon: const Icon(Icons.file_copy, color: Colors.white),
+                onPressed: controller.isLoading.value
+                    ? null
+                    : () {
+                        String? error;
+                        if (controller.fromController.text.isEmpty) {
+                          error = 'يرجى اختيار مدينة الانطلاق';
+                        } else if (controller.toController.text.isEmpty) {
+                          error = 'يرجى اختيار مدينة الوصول';
+                        } else if (controller.dateController.text.isEmpty) {
+                          error = 'يرجى اختيار التاريخ';
+                        } else if (controller.timeArriveController.text.isEmpty) {
+                          error = 'يرجى إدخال وقت الوصول';
+                        } else if (controller.timeLeaveController.text.isEmpty) {
+                          error = 'يرجى إدخال وقت الانطلاق';
+                        } else if (controller.priceController.text.isEmpty) {
+                          error = 'يرجى إدخال السعر';
+                        } else if (double.tryParse(controller.priceController.text) == null) {
+                          error = 'يرجى إدخال رقم صحيح للسعر';
+                        }
+                        if (error != null) {
+                          Get.snackbar('خطأ في الإدخال', error, backgroundColor: Colors.red, colorText: Colors.white);
+                          return;
+                        }
+                        controller.addTrip(companyId);
+                      },
+                icon: controller.isLoading.value
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.file_copy, color: Colors.white),
                 label: Text(
                   ManagerStrings.saveInformation,
                   style: TextStyle(
@@ -354,7 +388,7 @@ class AddTripPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: Center(
-                                child: TextField(
+                                child: TextFormField(
                                   controller: controller.dateController,
                                   readOnly: true,
                                   onTap: () => controller.selectDate(context),
@@ -426,7 +460,7 @@ class AddTripPage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
-                                    child: TextField(
+                                    child: TextFormField(
                                       controller: controller.timeArriveController,
                                       textAlign: TextAlign.center,
                                       textDirection: TextDirection.rtl,
@@ -481,7 +515,7 @@ class AddTripPage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
-                                    child: TextField(
+                                    child: TextFormField(
                                       controller: controller.timeLeaveController,
                                       textAlign: TextAlign.center,
                                       textDirection: TextDirection.rtl,
@@ -545,7 +579,7 @@ class AddTripPage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
-                                    child: TextField(
+                                    child: TextFormField(
                                       controller: controller.priceController,
                                       keyboardType: TextInputType.number,
                                       textAlign: TextAlign.center,
@@ -639,3 +673,4 @@ class AddTripPage extends StatelessWidget {
     });
   }
 }
+

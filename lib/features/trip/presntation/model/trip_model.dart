@@ -8,6 +8,7 @@ class Trip {
   final double price;
   final String? companyId;
   final String? id;
+  final String? notes;
 
   Trip({
     required this.from,
@@ -19,6 +20,7 @@ class Trip {
     required this.price,
     this.companyId,
     this.id,
+    this.notes,
   });
 
   Map<String, dynamic> toMap() {
@@ -32,6 +34,7 @@ class Trip {
       'price': price,
       'companyId': companyId,
       'id': id,
+      'notes': notes,
     };
   }
 
@@ -46,6 +49,7 @@ class Trip {
       price: (map['price'] as num?)?.toDouble() ?? 0.0,
       companyId: map['companyId'],
       id: map['id'],
+      notes: map['notes'],
     );
   }
 }
