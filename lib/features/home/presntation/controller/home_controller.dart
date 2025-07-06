@@ -1,21 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
+import '../../../company_login/presntation/controller/company_login_controller.dart';
+
 class HomeController extends GetxController {
   int pendingCount = 0;
   int respondedCount = 0;
 
-  Future<void> countBookingsByStatus() async {
+  Future<void> countBookingsByStatus(String companyId) async {
     final bookingsRef = FirebaseFirestore.instance.collection('bookings');
 
-    // Count pending status
-    final pendingSnapshot =
-    await bookingsRef.where('status', isEqualTo: 'pending').get();
+    // Count pending status for this company
+    final pendingSnapshot = await bookingsRef
+        .where('status', isEqualTo: 'pending')
+        .where('companyId', isEqualTo: companyId)
+        .get();
     pendingCount = pendingSnapshot.docs.length;
 
-    // Count all other statuses (not pending)
-    final respondedSnapshot =
-    await bookingsRef.where('status', isNotEqualTo: 'pending').get();
+    // Count confirmed status for this company
+    final respondedSnapshot = await bookingsRef
+        .where('status', isEqualTo: 'confirmed')
+        .where('companyId', isEqualTo: companyId)
+        .get();
     respondedCount = respondedSnapshot.docs.length;
 
     update(); // Notify the UI
@@ -24,6 +30,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    countBookingsByStatus(); // 🔄 Count based on status
+    final companyId = Get.find<CompanyLoginController>().loggedInCompanyId;
+    countBookingsByStatus(companyId!);
   }
 }

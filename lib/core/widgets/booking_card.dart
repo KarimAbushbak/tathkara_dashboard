@@ -7,6 +7,7 @@ import '../resources/manager_height.dart';
 import '../resources/manager_strings.dart';
 import '../../features/booking/presntation/controller/booking_controller.dart';
 import '../../features/booking/presntation/model/booking_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookingCard extends StatelessWidget {
   final Booking booking;
@@ -14,6 +15,7 @@ class BookingCard extends StatelessWidget {
   final BookingController bookingController;
   final double width;
   final double margin;
+  final VoidCallback? onCancel;
 
   const BookingCard({
     Key? key,
@@ -22,6 +24,7 @@ class BookingCard extends StatelessWidget {
     required this.bookingController,
     required this.width,
     required this.margin,
+    this.onCancel,
   }) : super(key: key);
 
   @override
@@ -44,12 +47,27 @@ class BookingCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('sy001',
-                  textDirection: TextDirection.rtl,
-                  style: TextStyle(
+              FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance.collection('trips').doc(booking.tripId).get(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Text('...');
+                  }
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return Text('---');
+                  }
+                  final tripNumber = snapshot.data!.get('tripNumber') ?? '';
+                  return Text(
+                    tripNumber,
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(
                       color: Colors.black,
                       fontSize: ManagerFontSizes.s24,
-                      fontWeight: FontWeight.bold)),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                },
+              ),
               Text(booking.userName,
                   textDirection: TextDirection.rtl,
                   style: TextStyle(
@@ -102,7 +120,7 @@ class BookingCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: () async {
+                  onPressed: onCancel ?? () async {
                     String? reason = await _showCancelDialog(context);
                     if (reason != null && reason.isNotEmpty) {
                       await bookingController.cancelBooking(booking.id, reason);

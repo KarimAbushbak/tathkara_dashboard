@@ -12,6 +12,7 @@ import '../../../../core/resources/manager_height.dart';
 import '../../../../core/resources/manager_strings.dart';
 import '../../../../core/resources/manager_width.dart';
 import '../../../company_login/presntation/controller/company_login_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PendingBookingsPage extends StatefulWidget {
   @override
@@ -52,182 +53,219 @@ class _PendingBookingsPageState extends State<PendingBookingsPage> {
                 itemCount: pendingBookings.length,
                 itemBuilder: (context, index) {
                   final booking = pendingBookings[index];
-                  return Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
-                        width: screenWidth * 0.9,
-                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                        decoration: BoxDecoration(
-                          color: ManagerColors.bgColorcompany,
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                            color: ManagerColors.bgFrameColorcompany,
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(height: ManagerHeight.h20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'SY001',
-                                  textDirection: TextDirection.rtl,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: ManagerFontSizes.s24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  booking.userName,
-                                  textDirection: TextDirection.rtl,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: ManagerFontSizes.s24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: ManagerHeight.h20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      'ذكر',
-                                      textDirection: TextDirection.rtl,
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: ManagerFontSizes.s18,
-                                        fontWeight: ManagerFontWeight.regular,
-                                      ),
-                                    ),
-                                    Text(
-                                      ManagerStrings.gender,
-                                      textDirection: TextDirection.rtl,
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: ManagerFontSizes.s18,
-                                        fontWeight: ManagerFontWeight.regular,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      booking.userPhone,
-                                      textDirection: TextDirection.rtl,
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: ManagerFontSizes.s18,
-                                        fontWeight: ManagerFontWeight.regular,
-                                      ),
-                                    ),
-                                    Text(
-                                      ManagerStrings.phoneBookATrip,
-                                      textDirection: TextDirection.rtl,
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: ManagerFontSizes.s18,
-                                        fontWeight: ManagerFontWeight.regular,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: ManagerHeight.h20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    await showCancelBookingDialog(
-                                      context,
-                                      booking.id,
-                                      booking.userName,
-                                      booking.userPhone,
-                                      onCancelled: () {
-                                        bookingController.updateBookingStatusLocally(booking.id, 'cancelled');
-                                      },
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                                  ),
-                                  child: Text(
-                                    'إلغاء',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ManagerFontSizes.s18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    final result = await Get.to(() => RescheduleBookingPage(bookingId: booking.id));
-                                    if (result == true) {
-                                      bookingController.updateBookingStatusLocally(booking.id, 'rescheduled');
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.yellow[700],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                                  ),
-                                  child: Text(
-                                    'تأجيل',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ManagerFontSizes.s18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    final result = await Get.to(() => RescheduleBookingPage(bookingId: booking.id));
-                                    if (result == true) {
-                                      bookingController.updateBookingStatusLocally(booking.id, 'rescheduled');
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                                  ),
-                                  child: Text(
-                                    'تأكيد',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: ManagerFontSizes.s18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                  return GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Text('تفاصيل المقاعد'),
+                          content: booking.selectedSeats.isNotEmpty
+                              ? Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: booking.selectedSeats.map<Widget>((seat) {
+                                    return Text('رقم المقعد: ''${seat['seatNumber']}\n'
+                                        '   الجنس: ${seat['gender']}');
+                                  }).toList(),
+                                )
+                              : Text('لا يوجد مقاعد محددة'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text('إغلاق'),
                             ),
                           ],
                         ),
-                      ),
-                      SizedBox(height: ManagerHeight.h10),
-
-                    ],
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
+                          width: screenWidth * 0.9,
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: ManagerColors.bgColorcompany,
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color: ManagerColors.bgFrameColorcompany,
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              SizedBox(height: ManagerHeight.h20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance.collection('trips').doc(booking.tripId).get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return Text('...');
+                                      }
+                                      if (!snapshot.hasData || !snapshot.data!.exists) {
+                                        return Text('---');
+                                      }
+                                      final tripNumber = snapshot.data!.get('tripNumber') ?? '';
+                                      return Text(
+                                        tripNumber,
+                                        textDirection: TextDirection.rtl,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: ManagerFontSizes.s24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Text(
+                                    booking.userName,
+                                    textDirection: TextDirection.rtl,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: ManagerFontSizes.s24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: ManagerHeight.h20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'ذكر',
+                                        textDirection: TextDirection.rtl,
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: ManagerFontSizes.s18,
+                                          fontWeight: ManagerFontWeight.regular,
+                                        ),
+                                      ),
+                                      Text(
+                                        ManagerStrings.gender,
+                                        textDirection: TextDirection.rtl,
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: ManagerFontSizes.s18,
+                                          fontWeight: ManagerFontWeight.regular,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        booking.userPhone,
+                                        textDirection: TextDirection.rtl,
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: ManagerFontSizes.s18,
+                                          fontWeight: ManagerFontWeight.regular,
+                                        ),
+                                      ),
+                                      Text(
+                                        ManagerStrings.phoneBookATrip,
+                                        textDirection: TextDirection.rtl,
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: ManagerFontSizes.s18,
+                                          fontWeight: ManagerFontWeight.regular,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: ManagerHeight.h20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      await showCancelBookingDialog(
+                                        context,
+                                        booking.id,
+                                        booking.userName,
+                                        booking.userPhone,
+                                        onCancelled: () {
+                                          bookingController.updateBookingStatusLocally(booking.id, 'cancelled');
+                                        },
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                                    ),
+                                    child: Text(
+                                      'إلغاء',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: ManagerFontSizes.s18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      final result = await Get.to(() => RescheduleBookingPage(bookingId: booking.id));
+                                      if (result == true) {
+                                        bookingController.updateBookingStatusLocally(booking.id, 'rescheduled');
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.yellow[700],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                                    ),
+                                    child: Text(
+                                      'تأجيل',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: ManagerFontSizes.s18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      final result = await Get.to(() => RescheduleBookingPage(bookingId: booking.id));
+                                      if (result == true) {
+                                        bookingController.updateBookingStatusLocally(booking.id, 'rescheduled');
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                                    ),
+                                    child: Text(
+                                      'تأكيد',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: ManagerFontSizes.s18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: ManagerHeight.h10),
+                      ],
+                    ),
                   );
                 },
               );

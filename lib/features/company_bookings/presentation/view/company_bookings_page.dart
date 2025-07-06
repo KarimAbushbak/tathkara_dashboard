@@ -80,7 +80,7 @@ class CompanyBookingsPage extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'SY001',
+                          controller.bookings[index].tripNumber.toString(),
                             style: TextStyle(
                               fontSize: ManagerFontSizes.s24,
                               fontWeight: ManagerFontWeight.bold,

@@ -21,6 +21,14 @@ class TripListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return GetBuilder<TripListController>(builder: (controller) {
+      final filteredTrips = controller.tripList.where((trip) {
+        final query = controller.searchQuery.toLowerCase();
+        return (trip.tripNumber?.toLowerCase().contains(query) ?? false) ||
+               trip.from.toLowerCase().contains(query) ||
+               trip.to.toLowerCase().contains(query) ||
+               trip.date.toLowerCase().contains(query);
+      }).toList();
+
       return Scaffold(
         bottomNavigationBar: Container(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -40,13 +48,23 @@ class TripListView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 55,
+                width: 250,
                 height: 55,
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: Icon(Icons.search, color: Colors.white, size: 30),
+                child: TextField(
+                  controller: controller.searchController,
+                  decoration: InputDecoration(
+                    hintText: 'بحث عن رحلة...',
+                    border: InputBorder.none,
+                    icon: Icon(Icons.search, color: Colors.blue),
+                  ),
+                  onChanged: controller.updateSearchQuery,
+                ),
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
@@ -89,7 +107,7 @@ class TripListView extends StatelessWidget {
           ),
         ),
         body: ListView.builder(
-          itemCount: controller.tripList.length,
+          itemCount: filteredTrips.length,
           itemBuilder: (context, index) {
             double containerWidth = screenWidth > 600 ? 500 : screenWidth * 0.9;
             double horizontalMargin = screenWidth > 600 ? (screenWidth - containerWidth) / 2 : screenWidth * 0.05;
@@ -123,7 +141,7 @@ class TripListView extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(
-                                controller.tripList[index].seats.toString(),
+                                filteredTrips[index].seats.toString(),
                                 textDirection: TextDirection.rtl,
                                 style: TextStyle(
                                   color: Colors.black,
@@ -134,7 +152,7 @@ class TripListView extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'SY001',
+            filteredTrips[index].tripNumber.toString(),
                             textDirection: TextDirection.rtl,
                             style: TextStyle(
                               color: Colors.black,
@@ -157,7 +175,7 @@ class TripListView extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(
-                                controller.tripList[index].date.toString(),
+                                filteredTrips[index].date.toString(),
                                 textDirection: TextDirection.rtl,
                                 style: TextStyle(
                                   color: Colors.black,
@@ -194,7 +212,7 @@ class TripListView extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                controller.tripList[index].price.toString(),
+                                filteredTrips[index].price.toString(),
                                 textDirection: TextDirection.rtl,
                                 style: TextStyle(
                                   color: Colors.black,
@@ -209,7 +227,7 @@ class TripListView extends StatelessWidget {
                               Column(
                                 children: [
                                   Text(
-                                    controller.tripList[index].timeArrive,
+                                    filteredTrips[index].timeArrive,
                                     textDirection: TextDirection.rtl,
                                     style: TextStyle(
                                       color: Colors.black,
@@ -218,7 +236,7 @@ class TripListView extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    controller.tripList[index].from.toString(),
+                                    filteredTrips[index].from.toString(),
                                     textDirection: TextDirection.rtl,
                                     style: TextStyle(
                                       color: Colors.black,
@@ -232,7 +250,7 @@ class TripListView extends StatelessWidget {
                               Column(
                                 children: [
                                   Text(
-                                    controller.tripList[index].timeLeave,
+                                    filteredTrips[index].timeLeave,
                                     textDirection: TextDirection.rtl,
                                     style: TextStyle(
                                       color: Colors.black,
@@ -241,7 +259,7 @@ class TripListView extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    controller.tripList[index].to.toString(),
+                                    filteredTrips[index].to.toString(),
                                     textDirection: TextDirection.rtl,
                                     style: TextStyle(
                                       color: Colors.black,
@@ -261,7 +279,7 @@ class TripListView extends StatelessWidget {
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              Get.to(() => EditTripPage(trip: controller.tripList[index]));
+                              Get.to(() => EditTripPage(trip: filteredTrips[index]));
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: ManagerColors.red,
@@ -284,8 +302,8 @@ class TripListView extends StatelessWidget {
                               Get.toNamed(
                                 Routes.bookingView,
                                 arguments: {
-                                  'companyId': controller.tripList[index].companyId,
-                                  'tripId': controller.tripList[index].id,
+                                  'companyId': filteredTrips[index].companyId,
+                                  'tripId': filteredTrips[index].id,
                                 },
                               );
                             },

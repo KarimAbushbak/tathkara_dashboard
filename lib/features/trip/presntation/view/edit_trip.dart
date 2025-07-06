@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:tathkara_dashboard/features/trip_list/presntation/controller/trip_list_controller.dart';
 
 import '../../../../core/resources/manager_colors.dart';
 import '../../../../core/resources/manager_font_sizes.dart';
@@ -13,6 +14,7 @@ import '../model/trip_model.dart';
 class EditTripPage extends StatelessWidget {
   final Trip trip;
   final TripController controller = Get.put(TripController());
+  final TripListController listController = Get.put(TripListController());
 
   EditTripPage({super.key, required this.trip}) {
     controller.fromController.text = trip.from;
@@ -27,7 +29,8 @@ class EditTripPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+
+
     return GetBuilder<TripController>(builder: (controller) {
       return Scaffold(
         appBar: AppBar(
@@ -109,7 +112,10 @@ class EditTripPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'SY001',
+                        trip.tripNumber ?? '',
+
+
+
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: ManagerFontSizes.s20,

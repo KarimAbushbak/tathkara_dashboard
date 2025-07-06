@@ -206,13 +206,29 @@ class AddTripPage extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'SY001',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: ManagerFontSizes.s20,
-                                fontWeight: ManagerFontWeight.regular,
-                              ),
+                            FutureBuilder<int>(
+                              future: controller.getCompanyTripCount(companyId),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Text(
+                                    'SY...',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: ManagerFontSizes.s20,
+                                      fontWeight: ManagerFontWeight.regular,
+                                    ),
+                                  );
+                                }
+                                final tripNumber = 'SY' + ((snapshot.data ?? 0) + 1).toString().padLeft(3, '0');
+                                return Text(
+                                  tripNumber,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: ManagerFontSizes.s20,
+                                    fontWeight: ManagerFontWeight.regular,
+                                  ),
+                                );
+                              },
                             ),
                             Text(
                               ManagerStrings.tripCode,
@@ -444,7 +460,7 @@ class AddTripPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  ManagerStrings.access,
+                                  'مدة الرحلة',
                                   style: TextStyle(
                                     fontWeight: ManagerFontWeight.bold,
                                     fontSize: 22,

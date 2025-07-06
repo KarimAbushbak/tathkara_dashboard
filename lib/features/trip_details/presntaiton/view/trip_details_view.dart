@@ -6,10 +6,12 @@ import '../../../../core/resources/manager_font_sizes.dart';
 import '../../../../core/resources/manager_font_weight.dart';
 import '../../../../core/resources/manager_height.dart';
 import '../../../../core/resources/manager_strings.dart';
+import '../../../trip/presntation/model/trip_model.dart';
 import '../controller/trip_details_controller.dart';
 
 class TripDetailsView extends StatelessWidget {
-  const TripDetailsView({super.key});
+  final Trip trip;
+  const TripDetailsView({super.key,required this.trip});
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +120,8 @@ class TripDetailsView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'SY001',
+                           trip.tripNumber ?? '',
+
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: ManagerFontSizes.s20,

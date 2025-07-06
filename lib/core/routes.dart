@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tathkara_dashboard/core/resources/manager_strings.dart';
@@ -10,6 +9,7 @@ import 'package:tathkara_dashboard/features/trip_details/presntaiton/view/trip_d
 
 import '../config/dependancy_injection.dart';
 import '../features/home/presntation/view/home_view.dart';
+import '../features/trip/presntation/model/trip_model.dart';
 import '../features/trip_list/presntation/view/trip_list_view.dart';
 
 
@@ -66,7 +66,8 @@ class RouteGenerator {
 
       case Routes.tripDetails:
         initTripLDetails();
-        return MaterialPageRoute(builder: (_) => TripDetailsView());
+        final trip = settings.arguments as Trip;
+        return MaterialPageRoute(builder: (_) => TripDetailsView(trip: trip));
       case Routes.allBooking:
         final args = settings.arguments as Map<String, dynamic>;
         final companyId = args['companyId'] as String;

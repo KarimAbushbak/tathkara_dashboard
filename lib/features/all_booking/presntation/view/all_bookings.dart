@@ -7,6 +7,7 @@ import '../../../../core/resources/manager_font_weight.dart';
 import '../../../../core/resources/manager_height.dart';
 import '../../../../core/resources/manager_strings.dart';
 import '../../../../core/widgets/booking_card.dart';
+import '../../../booking/presntation/view/cancel_booking_dialog.dart';
 import '../controller/reservations_controller.dart';
 import '../../../booking/presntation/controller/booking_controller.dart';
 
@@ -26,7 +27,8 @@ class ReservationsView extends StatelessWidget {
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: const Icon(Icons.sync, color: ManagerColors.primaryColor, size: 44,),
+          icon: const Icon(
+            Icons.sync, color: ManagerColors.primaryColor, size: 44,),
           onPressed: () => bookingController.fetchCompanyBookings(companyId),
         ),
         title: Text(
@@ -46,8 +48,12 @@ class ReservationsView extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.arrow_forward_ios_sharp, color: ManagerColors.primaryColor, size: 44,),
-            onPressed: () {},
+            icon: const Icon(
+              Icons.arrow_forward_ios_sharp, color: ManagerColors.primaryColor,
+              size: 44,),
+            onPressed: () {
+              Get.back();
+            },
           ),
         ],
       ),
@@ -55,14 +61,18 @@ class ReservationsView extends StatelessWidget {
         builder: (context, constraints) {
           double screenWidth = constraints.maxWidth;
           double containerWidth = screenWidth > 600 ? 500 : screenWidth * 0.9;
-          double horizontalMargin = screenWidth > 600 ? (screenWidth - containerWidth) / 2 : screenWidth * 0.05;
+          double horizontalMargin = screenWidth > 600 ? (screenWidth -
+              containerWidth) / 2 : screenWidth * 0.05;
 
           return Obx(() {
             String selected = controller.selectedReservationStatus.value;
             final bookings = bookingController.bookings;
-            final waitingBookings = bookings.where((b) => b.status == 'waiting' || b.status == 'pending').toList();
-            final confirmedBookings = bookings.where((b) => b.status == 'confirmed').toList();
-            final cancelledBookings = bookings.where((b) => b.status == 'cancelled').toList();
+            final waitingBookings = bookings.where((b) =>
+            b.status == 'waiting' || b.status == 'pending').toList();
+            final confirmedBookings = bookings.where((b) =>
+            b.status == 'confirmed').toList();
+            final cancelledBookings = bookings.where((b) =>
+            b.status == 'cancelled').toList();
 
             return SingleChildScrollView(
               child: Column(
@@ -77,29 +87,38 @@ class ReservationsView extends StatelessWidget {
                           label: ManagerStrings.cancelled,
                           color: ManagerColors.red,
                           isSelected: selected == 'cancelled',
-                          onTap: () => controller.selectReservationStatus('cancelled'),
+                          onTap: () =>
+                              controller.selectReservationStatus('cancelled'),
                         ),
                         const SizedBox(width: 12),
                         controller.buildFilterButton(
                           label: ManagerStrings.confirmed,
                           color: ManagerColors.green,
                           isSelected: selected == 'confirmed',
-                          onTap: () => controller.selectReservationStatus('confirmed'),
+                          onTap: () =>
+                              controller.selectReservationStatus('confirmed'),
                         ),
                         const SizedBox(width: 12),
                         controller.buildFilterButton(
                           label: ManagerStrings.waiting,
                           color: ManagerColors.amber,
                           isSelected: selected == 'waiting',
-                          onTap: () => controller.selectReservationStatus('waiting'),
+                          onTap: () =>
+                              controller.selectReservationStatus('waiting'),
                         ),
                       ],
                     ),
                   ),
                   SizedBox(height: ManagerHeight.h20),
-                  if (selected == 'waiting') _bookingList(waitingBookings, containerWidth, horizontalMargin, status: 'waiting'),
-                  if (selected == 'confirmed') _bookingList(confirmedBookings, containerWidth, horizontalMargin, status: 'confirmed'),
-                  if (selected == 'cancelled') _bookingList(cancelledBookings, containerWidth, horizontalMargin, status: 'cancelled'),
+                  if (selected == 'waiting') _bookingList(
+                      waitingBookings, containerWidth, horizontalMargin,
+                      status: 'waiting'),
+                  if (selected == 'confirmed') _bookingList(
+                      confirmedBookings, containerWidth, horizontalMargin,
+                      status: 'confirmed'),
+                  if (selected == 'cancelled') _bookingList(
+                      cancelledBookings, containerWidth, horizontalMargin,
+                      status: 'cancelled'),
                 ],
               ),
             );
@@ -109,7 +128,8 @@ class ReservationsView extends StatelessWidget {
     );
   }
 
-  Widget _bookingList(List bookings, double width, double margin, {required String status}) {
+  Widget _bookingList(List bookings, double width, double margin,
+      {required String status}) {
     if (bookings.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(32.0),
@@ -118,12 +138,56 @@ class ReservationsView extends StatelessWidget {
     }
     return Column(
       children: bookings.map<Widget>((booking) {
-        return BookingCard(
-          booking: booking,
-          status: status,
-          bookingController: bookingController,
-          width: width,
-          margin: margin,
+        return GestureDetector(
+          onTap: () {
+            showDialog(
+              context: Get.context!,
+              builder: (_) =>
+                  AlertDialog(
+                    title: Text('تفاصيل المقاعد'),
+                    content: booking.selectedSeats.isNotEmpty
+                        ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: booking.selectedSeats.map<Widget>((seat) {
+                        return Text(
+                            'رقم المقعد: ${seat['seatNumber']}\n'
+                                '   الجنس: ${seat['gender'] == 'male'
+                                ? 'ذكر'
+                                : seat['gender'] == 'female'
+                                ? 'أنثى'
+                                : seat['gender']}'
+                        );
+                      }).toList(),
+                    )
+                        : Text('لا يوجد مقاعد محددة'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(Get.context!).pop(),
+                        child: Text('إغلاق'),
+                      ),
+                    ],
+                  ),
+            );
+          },
+          child: BookingCard(
+            booking: booking,
+            status: status,
+            bookingController: bookingController,
+            width: width,
+            margin: margin,
+            onCancel: () async {
+              await showCancelBookingDialog(
+                Get.context!,
+                booking.id,
+                booking.userName,
+                booking.userPhone,
+                onCancelled: () {
+                  bookingController.fetchCompanyBookings(booking.companyId);
+                },
+              );
+            },
+          ),
         );
       }).toList(),
     );

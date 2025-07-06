@@ -79,6 +79,10 @@ class TripController extends GetxController {
     isLoading.value = true;
 
     try {
+      // Get the current trip count for this company
+      int tripCount = await getCompanyTripCount(companyId);
+      String tripNumber = 'SY' + (tripCount + 1).toString().padLeft(3, '0');
+
       final docRef = _firestore.collection('trips').doc();
       await docRef.set({
         'id': docRef.id,
@@ -92,6 +96,7 @@ class TripController extends GetxController {
         'price': double.tryParse(priceController.text.trim()) ?? 0.0,
         'notes': notesController.text.trim(),
         'createdAt': Timestamp.now(),
+        'tripNumber': tripNumber, // Save the trip number
       });
 
       Get.snackbar(
@@ -175,5 +180,10 @@ class TripController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<int> getCompanyTripCount(String companyId) async {
+    final query = await _firestore.collection('trips').where('companyId', isEqualTo: companyId).get();
+    return query.docs.length;
   }
 }

@@ -16,9 +16,8 @@ Future<void> showCancelBookingDialog(
   Function()? onCancelled,
 }) async {
   final List<String> reasons = [
-    'تغيير في الخطة',
-    'ظروف طارئة',
-    'وجدت عرضاً أفضل',
+    'الرحلة أُلغيت',
+    'الرحلة تأجلت',
     'أسباب أخرى',
   ];
 
@@ -68,8 +67,10 @@ Widget _reasonButton(BuildContext ctx, String text, String bookingId, Function()
       Navigator.of(ctx).pop();
       if (text == 'أسباب أخرى') {
         showCustomReasonDialog(ctx, bookingId, onCancelled);
-      } else {
-        _cancelBooking(ctx, bookingId, text, onCancelled);
+      } else if (text == 'الرحلة تأجلت') {
+        showDelayDialog(ctx, bookingId, onCancelled);
+      } else if (text == 'الرحلة أُلغيت') {
+        _cancelBooking(ctx, bookingId, 'الرحلة أُلغيت', onCancelled, status: 'cancelled');
       }
     },
     child: Container(
@@ -83,6 +84,37 @@ Widget _reasonButton(BuildContext ctx, String text, String bookingId, Function()
       alignment: Alignment.center,
       child: Text(text),
     ),
+  );
+}
+
+void showDelayDialog(BuildContext context, String bookingId, Function()? onDelayed) {
+  TextEditingController delayController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (ctx) {
+      return AlertDialog(
+        backgroundColor: ManagerColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text('يرجى إدخال الوقت الجديد'),
+        content: TextField(
+          controller: delayController,
+          decoration: InputDecoration(hintText: 'الوقت الجديد'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              String newTime = delayController.text.trim();
+              Navigator.of(ctx).pop();
+              _cancelBooking(context, bookingId, newTime, onDelayed, status: 'delayed');
+            },
+            child: Text('تأكيد'),
+          ),
+        ],
+      );
+    },
   );
 }
 
@@ -142,7 +174,7 @@ void showCustomReasonDialog(BuildContext context, String bookingId, Function()? 
             onPressed: () {
               String reason = customReasonController.text.trim();
               Navigator.of(ctx).pop();
-              _cancelBooking(context, bookingId, reason, onCancelled);
+              _cancelBooking(context, bookingId, reason, onCancelled, status: 'cancelled');
             },
             child: Text(
               'تأكيد',
@@ -158,14 +190,14 @@ void showCustomReasonDialog(BuildContext context, String bookingId, Function()? 
   );
 }
 
-void _cancelBooking(BuildContext context, String bookingId, String reason, Function()? onCancelled) async {
+void _cancelBooking(BuildContext context, String bookingId, String reason, Function()? onCancelled, {String status = 'cancelled'}) async {
   await FirebaseFirestore.instance
       .collection('bookings')
       .doc(bookingId)
       .update({
-    'status': 'cancelled',
+    'status': status,
     'cancellationReason': reason,
   });
-  Get.snackbar("تم", "تم إلغاء الحجز");
+  Get.snackbar("تم", status == 'delayed' ? "تم تأجيل الحجز" : "تم إلغاء الحجز");
   if (onCancelled != null) onCancelled();
 } 

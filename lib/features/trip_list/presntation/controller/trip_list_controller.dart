@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
 import '../../../company_login/presntation/controller/company_login_controller.dart';
 import '../../../trip/presntation/model/trip_model.dart';
 
 class TripListController extends GetxController {
   List<Trip> tripList = [];
+  final TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
 
   @override
   void onInit() {
@@ -31,5 +34,10 @@ class TripListController extends GetxController {
     }).toList();
 
     update(); // notify UI
+  }
+
+  void updateSearchQuery(String value) {
+    searchQuery = value;
+    update();
   }
 }

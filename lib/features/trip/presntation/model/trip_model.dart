@@ -9,6 +9,7 @@ class Trip {
   final String? companyId;
   final String? id;
   final String? notes;
+  final String? tripNumber;
 
   Trip({
     required this.from,
@@ -21,6 +22,7 @@ class Trip {
     this.companyId,
     this.id,
     this.notes,
+    this.tripNumber,
   });
 
   Map<String, dynamic> toMap() {
@@ -35,6 +37,7 @@ class Trip {
       'companyId': companyId,
       'id': id,
       'notes': notes,
+      'tripNumber': tripNumber,
     };
   }
 
@@ -50,6 +53,7 @@ class Trip {
       companyId: map['companyId'],
       id: map['id'],
       notes: map['notes'],
+      tripNumber: map['tripNumber'],
     );
   }
 }
